@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ilp-logger": "^1.3.0-alpha.1",
+    "ilp-plugin": "^3.4.1",
+    "ilp-protocol-spsp": "^3.0.0",
+    "pino": "^5.17.0"
+  }
+}
