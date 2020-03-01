@@ -11,8 +11,8 @@ var cryptoSelected = "";
 var amountCrypto = "";
 
 // Constants for ILP
-const EBAY_PAYMENT_POINTER = "$rafiki.money/p/dfuelling";
-const ONLINE_CUSTOMER_ACCOUNT_ID = "user_Hbre7ySf";
+const ONLINE_ECOMMERCE_SITE_PAYMENT_POINTER = "$money.ilpv4.dev/user_yMVY5ZoT"; // In USD
+const ONLINE_CUSTOMER_ACCOUNT_ID = "user_Hbre7ySf"; // In XRP
 
 function selectPaymentXRP() {
     // console.log(selectPayment.caller);
@@ -25,12 +25,27 @@ function selectPaymentETH() {
     processTransaction();
 }
 
-function selectPaymentIL() {
-    const amount = document
+function selectPaymentILP() {
+    let amount = document
         .querySelectorAll("[data-test-id=TOTAL]")[0]
         .getElementsByClassName("amount")[0]
         .getElementsByTagName("span")[1]
         .innerText.substring(1);
+
+    amount = Number(amount * 4.305568); // Note: 4.305568 is today rate from USD to XRP
+    let amountReceivedFromILPTx = 0;
+    let amountSent = amount;
+
+    // Loader
+    $("#selectorMenu").remove();
+    $("#dialog").append(
+        `
+			<h5>Order Details</h5>
+			<h5 id="instruction"></h5>
+			<h5 id="instructionB"></h5>
+			<img src="https://i.imgur.com/oQbN0QC.gif" style="height: 150px; width: 150px;" id="qrcode">  </img>
+			`
+    );
 
     try {
         $.ajax({
@@ -39,17 +54,31 @@ function selectPaymentIL() {
             data: JSON.stringify({
                 accountId: ONLINE_CUSTOMER_ACCOUNT_ID,
                 amount: Math.round(amount),
-                destinationPaymentPointer: EBAY_PAYMENT_POINTER
+                destinationPaymentPointer: ONLINE_ECOMMERCE_SITE_PAYMENT_POINTER
             }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function() {
-                console.log("Success");
-                console.log(`Sent $${amount} XRP`);
+            success: function(data) {
+                if (data) {
+                    amountReceivedFromILPTx = data.response.amountDelivered;
+                    amountSent = data.response.amountSent;
+                    console.log(`You sent $${amountSent} XRP`);
+                    console.log(`Store received $${amountReceivedFromILPTx} USD`);
+                    $("#instruction").text(
+                        "You have just sent " +
+                            parseFloat(amountSent).toFixed(6) +
+                            " " +
+                            "XRP" +
+                            " in " +
+                            amountReceivedFromILPTx +
+                            " USD" +
+                            " with ILP"
+                    );
+                }
             }
-		});
-
-		getAccountBalanceL()
+        });
+        $("#qrcode").attr("src", "https://media.giphy.com/media/elMBHeErQeSNXFLrTj/giphy.gif");
+        // getAccountBalanceL()
     } catch (err) {
         console.error(err);
     }
@@ -61,8 +90,8 @@ function getAccountBalanceL() {
             url: `http://localhost:3000/api/get/${ONLINE_CUSTOMER_ACCOUNT_ID}`,
             type: "GET",
             success: function(data) {
-				console.log("Success");
-				console.log(data)
+                console.log("Success");
+                console.log(data);
                 // console.log(`Your balance: $${amount} XRP`);
             }
         });
@@ -221,7 +250,7 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
     $(function() {
         $("#selectXRP").on("click", selectPaymentXRP);
         $("#selectETH").on("click", selectPaymentETH);
-        $("#selectIL").on("click", selectPaymentIL);
+        $("#selectIL").on("click", selectPaymentILP);
         // var enableTransaction = false;
         $("#dialog").dialog();
         // $("#menu").menu();
