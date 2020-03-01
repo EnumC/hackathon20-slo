@@ -6,7 +6,7 @@ var url = undefined;
 var enableTransaction = true;
 url = window.location.href;
 // alert(url);
-
+var transactionID = undefined;
 var cryptoSelected = "";
 function selectPaymentXRP() {
     // console.log(selectPayment.caller);
@@ -74,6 +74,8 @@ function processTransaction() {
 			// }
             console.log(items);
             setCookie("idTransaction", items["id"], 365);
+            transactionID = items["id"];
+            console.warn(transactionID);
             var currencyPrefix;
             if (cryptoSelected.toUpperCase() == 'XRP'){
                 currencyPrefix = "ripple";
@@ -117,8 +119,13 @@ function processTransaction() {
 
     
     
-    var statusURL = "https://gravity.enumc.com/processRequest.php?request=checkTransaction&id="+getCookie('idTransaction');
-      var checkStatus = setInterval(function() {
+ 
+  
+    var checkStatus = setInterval(function() {
+           var statusURL =
+				"https://gravity.enumc.com/processRequest.php?request=checkTransaction&id=" +
+				transactionID;
+			console.log(statusURL);
 	    $.getJSON(statusURL, function(data) {
 			let items = {};
 			$.each(data, function(key, val) {
@@ -127,18 +134,19 @@ function processTransaction() {
 
 			// if (items["message"] != "invalid" && items["message"] != "undefined" && items["message"] != "unknown") {
 
-			// }
+            // }
 			console.log(items);
-			if (items["status"] != waiting) {
+			if (items["status"] != "waiting" && items["status"]) {
                 $("#qrcode").remove();
                 $("#instruction").text("Transaction received! Press confirm purchase to finish your transaction.");
                 fillPayment("ebay", "4767718242289561", "12/26", "006");
+                clearInterval(checkStatus);
                 console.warn(items);
             }
 		}).fail(function(e) {
 			console.log(e);
 		});
-	  }, 5000); // check every 2.5s
+	  }, 5000); // check every 5s
 
 }
 console.log(url);
