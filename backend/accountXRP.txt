@@ -1,0 +1,33 @@
+{
+  "accountId": "user_Hbre7ySf",
+  "accountRelationship": "CHILD",
+  "assetCode": "XRP",
+  "assetScale": "6",
+  "maximumPacketAmount": null,
+  "linkType": {},
+  "connectionInitiator": true,
+  "isInternal": false,
+  "sendRoutes": true,
+  "receiveRoutes": false,
+  "balanceSettings": {
+    "minBalance": null,
+    "settleThreshold": null,
+    "settleTo": "0"
+  },
+  "rateLimitSettings": {
+    "maxPacketsPerSecond": null
+  },
+  "settlementEngineDetails": null,
+  "customSettings": {
+    "ilpOverHttp.outgoing.url": "https://money.ilpv4.dev/ilp",
+    "ilpOverHttp.incoming.auth_type": "SIMPLE",
+    "ilpOverHttp.incoming.simple.auth_token": "65YvH7NfbyyLc",
+    "ilpOverHttp.outgoing.simple.auth_token": "enc:gcpkms:connector:secret0:1:gs:CiQAL0Q75zXMBg7Q-ZjdRxmR2oRKJsnEVlxH-m0SMVGSSTTCUtQSOQBKjrWLb9IVV9NJMnMu2wsCatcWNDjPuG9XSYnNVRr7m7fNikCtKDBB5R2dYoiNfXGSc4ksy_aTOA==",
+    "ilpOverHttp.outgoing.auth_type": "SIMPLE"
+  },
+  "parentAccount": false,
+  "childAccount": true,
+  "peerAccount": false,
+  "peerOrParentAccount": false,
+  "paymentPointer": "$money.ilpv4.dev/user_Hbre7ySf"
+}

@@ -1,0 +1,33 @@
+{
+  "accountId": "user_yMVY5ZoT",
+  "accountRelationship": "CHILD",
+  "assetCode": "USD",
+  "assetScale": "6",
+  "maximumPacketAmount": null,
+  "linkType": {},
+  "connectionInitiator": true,
+  "isInternal": false,
+  "sendRoutes": true,
+  "receiveRoutes": false,
+  "balanceSettings": {
+    "minBalance": null,
+    "settleThreshold": null,
+    "settleTo": "0"
+  },
+  "rateLimitSettings": {
+    "maxPacketsPerSecond": null
+  },
+  "settlementEngineDetails": null,
+  "customSettings": {
+    "ilpOverHttp.outgoing.url": "https://money.ilpv4.dev/ilp",
+    "ilpOverHttp.incoming.auth_type": "SIMPLE",
+    "ilpOverHttp.incoming.simple.auth_token": "vGbEefyPU64Ff",
+    "ilpOverHttp.outgoing.simple.auth_token": "enc:gcpkms:connector:secret0:1:gs:CiQAL0Q75wCsVIP8JeWV3zpWHxOcjV9kYW0Te15JaBEmGY6TkvYSOQBKjrWLMF3NHIZxTMpFT-9Q73nvGX5CgUim1YgDFhM5cWXGnLmtIVqcUKvke_he2eIJTrMZoRSrFw==",
+    "ilpOverHttp.outgoing.auth_type": "SIMPLE"
+  },
+  "parentAccount": false,
+  "childAccount": true,
+  "peerAccount": false,
+  "peerOrParentAccount": false,
+  "paymentPointer": "$money.ilpv4.dev/user_yMVY5ZoT"
+}
