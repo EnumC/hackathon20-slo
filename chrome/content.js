@@ -8,6 +8,7 @@ url = window.location.href;
 // alert(url);
 var transactionID = undefined;
 var cryptoSelected = "";
+var amountCrypto = "";
 function selectPaymentXRP() {
     // console.log(selectPayment.caller);
     cryptoSelected = "xrp";
@@ -84,7 +85,8 @@ function processTransaction() {
 						currencyPrefix = "ethereum";
 					} else {
 						currencyPrefix = cryptoSelected.toLowerCase();
-					}
+                    }
+            amountCrypto = items["amount_from"];
 			$("#qrcode").attr(
 				"src",
 				"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
@@ -165,9 +167,11 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
         <div id="selectorMenu">
             <h5>Welcome to duo - The New Way To Pay</h5>
             <h6>Please select payment method: </h6>
-            <div class="ui-grid-a">
+            <div class="ui-grid-b">
                 <img class="ui-block-a" style="width:25%; height: auto; float:left;" id="selectXRP" src="https://cdn4.iconfinder.com/data/icons/cryptocoins/227/XRP-alt-512.png"></img>
                 <img class="ui-block-b" style="width:25%; height: auto; float:right;" id="selectETH" src="https://cdn4.iconfinder.com/data/icons/cryptocoins/227/ETH-512.png"></img>
+                <img class="ui-block-c" style="width: 42%; height: auto; margin-top: 7%;" id="selectIL" src="https://miro.medium.com/max/646/1*2IYd3wa_Lg7TwmudoS-6fg.png"></img>
+
             </div>
         </div>
         
@@ -176,6 +180,7 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
 	$(function() {
         $("#selectXRP").on("click", selectPaymentXRP);
         $("#selectETH").on("click", selectPaymentETH);
+        $("#selectIL").on("click", selectPaymentIL);
 		// var enableTransaction = false;
         $("#dialog").dialog();
         // $("#menu").menu();
@@ -202,7 +207,12 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
 function fillPayment(merchant, card,expiry,seccode) {
     switch (merchant) {
         case "ebay": {
-							  document.querySelectorAll("[data-test-id=SHOW_MORE]")[0].click();
+							  try {
+                                  document.querySelectorAll("[data-test-id=SHOW_MORE]")[0].click();
+                              }
+                              catch (e) {
+                                  console.log("show more not available. not an issue.")
+                              }
 							  document.querySelectorAll("[data-test-id=GET_PAYMENT_INSTRUMENT]")[0].click();
 							  var ifLoaded = setInterval(function() {
 							    if (document.getElementById("cardNumber")) {
@@ -217,7 +227,14 @@ function fillPayment(merchant, card,expiry,seccode) {
 										"securityCode"
 									).value = seccode;
 							      document.getElementById("rememberCard").value = "off";
-							      document.querySelectorAll("[data-test-id=ADD_CARD]")[0].click();
+                                  document.querySelectorAll("[data-test-id=ADD_CARD]")[0].click();
+                                  
+                                    document
+                                        .querySelectorAll("[data-test-id=TOTAL]")[0]
+                                        .getElementsByClassName("amount")[0]
+                                        .getElementsByTagName("span")[1]
+                                        .innerText = cryptoSelected.toUpperCase() + " " + amountCrypto;
+
 							      clearInterval(ifLoaded);
 							    }
 							  }, 100); // check every 100ms
