@@ -1,0 +1,25 @@
+{
+  "name": "PhotonPayments",
+  "description": "The new way to pay!",
+  "version": "1.0.2",
+  // "icons": {
+    // "128": "128.png",
+    // "48": "48.png"
+  // },
+  // "background": {
+  //   "scripts": ["content.js"],
+  //   "persistent": false
+  // },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["jquery.js", "jquery-ui.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": ["<all_urls>", "tabs"],
+  "web_accessible_resources": [],
+  "author": "Eric Qian, Erik Andersson, Dennis",
+  "homepage_url": "https://bananiumlabs.com",
+  "manifest_version": 2
+}
