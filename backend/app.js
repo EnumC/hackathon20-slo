@@ -52,7 +52,7 @@ app.post("/api/send", async (req, res) => {
     } catch (err) {
         console.error(err);
     }
-
+    console.log(response.data)
     res.status(202).send({response: response.data});
 });
 
@@ -72,7 +72,7 @@ app.get("/api/get/:accountId", async (req, res) => {
     } catch (err) {
         console.error(err);
     }
-
+    console.log(response.data)
     res.status(202).json({response: response.data});
 });
 
