@@ -20,6 +20,10 @@ function selectPaymentETH() {
     processTransaction();
 }
 
+function selectPaymentIL() {
+
+}
+
 function setCookie(cookieName, cookieValue, expiryInDays) {
 	var expiryDate = new Date();
 	expiryDate.setTime(
@@ -141,8 +145,12 @@ function processTransaction() {
 			if (items["status"] != "waiting" && items["status"]) {
                 $("#qrcode").remove();
                 $("#instruction").text("Transaction received! Press confirm purchase to finish your transaction.");
-                fillPayment("ebay", "4767718242289561", "12/26", "006");
+                if (ebay) 
+                    fillPayment("ebay", "4767718242289561", "12/26", "006");
+                else (amazon) 
+                    fillPayment("amazon");
                 clearInterval(checkStatus);
+                vague.unblur();
                 console.warn(items);
             }
 		}).fail(function(e) {
@@ -151,21 +159,52 @@ function processTransaction() {
 	  }, 5000); // check every 5s
 
 }
-console.log(url);
 if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
-	var orderTotal = document
-		.querySelectorAll("[data-test-id=TOTAL]")[0]
-		.getElementsByClassName("amount")[0]
-		.getElementsByTagName("span")[1]
-		.innerText.substring(1);
-    console.log("Order total", orderTotal);
-    
+    var ebay = true;
+}
+else if (url.startsWith(
+		"https://smile.amazon.com/gp/buy/spc/handlers/display.html?hasWorkingJavascript=1"
+	)) {
+        var amazon = true;
+    }
+
+console.log(url);
+if (amazon || ebay) {
+	try {
+        if (ebay) {
+            var orderTotal = document
+				.querySelectorAll("[data-test-id=TOTAL]")[0]
+				.getElementsByClassName("amount")[0]
+				.getElementsByTagName("span")[1]
+				.innerText.substring(1);
+        }
+        else if (amazon) {
+            var orderTotal = document
+				.getElementsByClassName(
+					"a-color-price a-size-medium a-text-right grand-total-price aok-nowrap a-text-bold a-nowrap"
+				)[0]
+				.innerText.substring(1);
+
+        }
+		
+	} catch (e) {
+		console.warn("total not found");
+	}
+
+	console.log("Order total", orderTotal);
+
+	if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
+		var vague = $("#mainContent").Vague({ intensity: 10 });
+	} else {
+		var vague = $("#payment").Vague({ intensity: 10 });
+	}
+	vague.blur();
 
 	$("head")
-		.append(`<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		.append(`<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
       <div id="dialog" title="Transaction">
         <div id="selectorMenu">
-            <h5>Welcome to duo - The New Way To Pay</h5>
+            <h5>Welcome to Mercury - World Of Frictionless Payment</h5>
             <h6>Please select payment method: </h6>
             <div class="ui-grid-b">
                 <img class="ui-block-a" style="width:25%; height: auto; float:left;" id="selectXRP" src="https://cdn4.iconfinder.com/data/icons/cryptocoins/227/XRP-alt-512.png"></img>
@@ -178,14 +217,27 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
       </div>`);
 
 	$(function() {
-        $("#selectXRP").on("click", selectPaymentXRP);
-        $("#selectETH").on("click", selectPaymentETH);
-        $("#selectIL").on("click", selectPaymentIL);
+		$("#selectXRP").on("click", selectPaymentXRP);
+		$("#selectETH").on("click", selectPaymentETH);
+		$("#selectIL").on("click", selectPaymentIL);
 		// var enableTransaction = false;
-        $("#dialog").dialog();
-        // $("#menu").menu();
-
-		
+		$("#dialog").dialog();
+		document.getElementsByClassName("ui-dialog")[0].focus();
+		$("#dialog").focusout(function() {
+			console.log("dialog lost focus");
+			vague.unblur();
+		});
+		var checkFocus = setInterval(function() {
+			if (!document.activeElement.hasAttribute("role")) {
+				vague.unblur();
+				clearInterval(checkFocus);
+				// console.log("unblurring");
+			} else {
+				// vague.blur();
+				// console.log("blurring");
+			}
+		}, 50);
+		// $("#menu").menu();
 	});
 
 	console.log("detected ebay checkout. Attempting to fill");
@@ -205,39 +257,76 @@ if (url.startsWith("https://pay.ebay.com/rxo?action=view&")) {
 }
 
 function fillPayment(merchant, card,expiry,seccode) {
+    vague.unblur();
     switch (merchant) {
-        case "ebay": {
-							  try {
-                                  document.querySelectorAll("[data-test-id=SHOW_MORE]")[0].click();
-                              }
-                              catch (e) {
-                                  console.log("show more not available. not an issue.")
-                              }
-							  document.querySelectorAll("[data-test-id=GET_PAYMENT_INSTRUMENT]")[0].click();
-							  var ifLoaded = setInterval(function() {
-							    if (document.getElementById("cardNumber")) {
-							      console.log("cardInputDialog detected");
-							      document.getElementById(
-										"cardNumber"
-									).value = card;
-							      document.getElementById(
-										"cardExpiryDate"
-									).value = expiry;
-							      document.getElementById(
-										"securityCode"
-									).value = seccode;
-							      document.getElementById("rememberCard").value = "off";
-                                  document.querySelectorAll("[data-test-id=ADD_CARD]")[0].click();
-                                  
-                                    document
-                                        .querySelectorAll("[data-test-id=TOTAL]")[0]
-                                        .getElementsByClassName("amount")[0]
-                                        .getElementsByTagName("span")[1]
-                                        .innerText = cryptoSelected.toUpperCase() + " " + amountCrypto;
+		case "ebay": {
+			try {
+				document
+					.querySelectorAll("[data-test-id=SHOW_MORE]")[0]
+					.click();
+			} catch (e) {
+				console.log("show more not available. not an issue.");
+            }
+            try {
+                document
+				.querySelectorAll("[data-test-id=GET_PAYMENT_INSTRUMENT]")[0]
+				.click();
+            } catch (e) {
+                console.log("payment instrument not available. not an issue.");
+            }
+			
+			var ifLoaded = setInterval(function() {
+				if (document.getElementById("cardNumber")) {
+					console.log("cardInputDialog detected");
+					document.getElementById("cardNumber").value = card;
+					document.getElementById("cardExpiryDate").value = expiry;
+					document.getElementById("securityCode").value = seccode;
+					document.getElementById("rememberCard").value = "off";
+					document
+						.querySelectorAll("[data-test-id=ADD_CARD]")[0]
+						.click();
 
-							      clearInterval(ifLoaded);
-							    }
-							  }, 100); // check every 100ms
-						}
-    }
+					document
+						.querySelectorAll("[data-test-id=TOTAL]")[0]
+						.getElementsByClassName("amount")[0]
+						.getElementsByTagName("span")[1].innerText =
+						cryptoSelected.toUpperCase() + " " + amountCrypto;
+
+					clearInterval(ifLoaded);
+				}
+			}, 100); // check every 100ms
+			break;
+		}
+		case "amazon": {
+			try {
+				document.getElementById("payChangeButtonId").click();
+			} catch (e) {
+				console.log("show more not available. not an issue.");
+            }
+            try {
+                document
+					.querySelectorAll(
+						"[data-test-id=GET_PAYMENT_INSTRUMENT]"
+					)[0]
+					.click();
+            }
+            catch (e) {
+                console.log("not fatal. cant get payment instrument");
+            }
+			
+			var ifLoaded = setInterval(function() {
+				if (document.getElementsByClassName('a-link-emphasis')[0]) {
+					console.log("cardInputDialog detected");
+					document.getElementsByClassName('a-link-emphasis')[0].click();
+                    document.getElementsByName('addCreditCardNumber')[0].value = "4767718242289561";
+                    document.getElementsByName('ppw-accountHolderName')[1].value = "PhoPayment";
+                    document.getElementsByName('ppw-expirationDate_month')[0].value = 12;
+                    document.getElementsByName('ppw-expirationDate_year')[0].value = 2026;
+                    document.getElementsByName('ppw-widgetEvent:AddCreditCardEvent')[0].click();
+					clearInterval(ifLoaded);
+				}
+			}, 100); // check every 100ms
+			break;
+		}
+	}
 }
