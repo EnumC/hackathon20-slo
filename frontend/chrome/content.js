@@ -78,7 +78,16 @@ function selectPaymentILP() {
             }
         });
         $("#qrcode").attr("src", "https://media.giphy.com/media/elMBHeErQeSNXFLrTj/giphy.gif");
-        // getAccountBalanceL()
+
+        // const card = "4767718242289561";
+        // const expiry = "12/26";
+        // const seccode = "006";
+		// getAccountBalanceL()
+
+        document
+            .querySelectorAll("[data-test-id=TOTAL]")[0]
+            .getElementsByClassName("amount")[0]
+            .getElementsByTagName("span")[1].innerText = "XRP" + " " + amount;
     } catch (err) {
         console.error(err);
     }
